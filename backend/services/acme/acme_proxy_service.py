@@ -253,7 +253,7 @@ class AcmeProxyService:
             if not provider:
                 raise Exception(f"No DNS provider configured for domain: {domain}. Configure it in ACME > Domains.")
             domain_providers[domain] = provider
-        The
+        
         # Forward to upstream Let's Encrypt
         payload = {
             "identifiers": identifiers,
@@ -392,7 +392,7 @@ class AcmeProxyService:
         # Find the proxy order that contains this challenge's authz URL
         order = self._find_order_for_challenge(chall_url, AcmeClientOrder)
         if not order:
-             raise RuntimeError("No pending proxy order found for this challenge.")
+            raise RuntimeError("No pending proxy order found for this challenge.")
 
         domain = order.domains_list[0].lstrip('*.')
         
@@ -482,7 +482,7 @@ class AcmeProxyService:
                 
                 # Trigger upstream validation
                 logger.info(f"[ACME Proxy BG] Triggering upstream validation for {domain}")
-                payload = {"keyAuthorization": key_authz}
+                payload = {}
                 resp = self._post_jws(chall_url, payload, kid=self.account_url)
                 
                 if resp.status_code != 200:
@@ -492,8 +492,9 @@ class AcmeProxyService:
                     
             except Exception as e:
                 logger.error(f"[ACME Proxy BG] Error in background challenge setup: {e}", exc_info=True)
-                if 'db' in locals():
-                    db.session.rollback()
+                db.session.rollback()
+            finally:
+                db.session.remove()
     
     def _find_order_for_challenge(self, chall_url, AcmeClientOrder):
         """Find the proxy order associated with a challenge URL."""
@@ -593,6 +594,9 @@ class AcmeProxyService:
             cert_url = order['certificate']
             cert_id = base64.urlsafe_b64encode(cert_url.encode()).rstrip(b'=').decode()
             order['certificate'] = f"{self.base_url}/acme/proxy/cert/{cert_id}"
+        
+        # Rewrite authorization URLs
+        
             
         return order
 
