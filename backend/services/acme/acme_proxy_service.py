@@ -253,7 +253,7 @@ class AcmeProxyService:
             if not provider:
                 raise Exception(f"No DNS provider configured for domain: {domain}. Configure it in ACME > Domains.")
             domain_providers[domain] = provider
-        
+        The
         # Forward to upstream Let's Encrypt
         payload = {
             "identifiers": identifiers,
@@ -466,8 +466,8 @@ class AcmeProxyService:
                 provider.create_txt_record(zone, full_record_name, txt_value)
                 
                 # Wait for DNS propagation
-                logger.info(f"[ACME Proxy BG] Waiting 45s for propagation for {domain}...")
-                time.sleep(45)
+                logger.info(f"[ACME Proxy BG] Waiting 30s for propagation for {domain}...")
+                time.sleep(30)
                 
                 # Store record info for cleanup
                 records = json.loads(order.dns_records_created) if order.dns_records_created else []
