@@ -594,10 +594,7 @@ class AcmeProxyService:
             cert_url = order['certificate']
             cert_id = base64.urlsafe_b64encode(cert_url.encode()).rstrip(b'=').decode()
             order['certificate'] = f"{self.base_url}/acme/proxy/cert/{cert_id}"
-        
-        # Rewrite authorization URLs
-        
-            
+
         return order
 
     def finalize_order(self, order_id_b64, csr_pem):
